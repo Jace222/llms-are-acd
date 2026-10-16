@@ -123,42 +123,48 @@ class LLMDefenderPolicy(Policy):
             # Map actions to their required parameters
             if "remove" in lower_response_action and hostname:
                 action_log[f"{self.name}_remove"] = 1
-                wandb.log(action_log, step=wandb.run.step)
+                if wandb.run:
+                    wandb.log(action_log, step=wandb.run.step)
                 Logger.debug(f"Creating Remove action with hostname: {hostname}")
                 self.last_action = f"Remove host:{hostname}"
                 return Remove(session=0, agent=self.name, hostname=hostname)
 
             elif "restore" in lower_response_action and hostname:
                 action_log[f"{self.name}_restore"] = 1
-                wandb.log(action_log, step=wandb.run.step)
+                if wandb.run:
+                    wandb.log(action_log, step=wandb.run.step)
                 Logger.debug(f"Creating Restore action with hostname: {hostname}")
                 self.last_action = f"Restore host:{hostname}"
                 return Restore(session=0, agent=self.name, hostname=hostname)
 
             elif "blocktrafficzone" in lower_response_action and target_subnet:
                 action_log[f"{self.name}_blocktrafficzone"] = 1
-                wandb.log(action_log, step=wandb.run.step)
+                if wandb.run:
+                    wandb.log(action_log, step=wandb.run.step)
                 Logger.debug(f"Creating BlockTrafficZone action with subnet: {target_subnet}")
                 self.last_action = f"BlockTrafficZone subnet:{target_subnet}"
                 return BlockTrafficZone(session=0, agent=self.name, from_subnet=self.subnet, to_subnet=target_subnet)
 
             elif "allowtrafficzone" in lower_response_action and target_subnet:
                 action_log[f"{self.name}_allowtrafficzone"] = 1
-                wandb.log(action_log, step=wandb.run.step)
+                if wandb.run:
+                    wandb.log(action_log, step=wandb.run.step)
                 Logger.debug(f"Creating AllowTrafficZone action with subnet: {target_subnet}")
                 self.last_action = f"AllowTrafficZone subnet:{target_subnet}"
                 return AllowTrafficZone(session=0, agent=self.name, from_subnet=self.subnet, to_subnet=target_subnet)
 
             elif "deploydecoy" in lower_response_action and hostname:
                 action_log[f"{self.name}_deploydecoy"] = 1
-                wandb.log(action_log, step=wandb.run.step)
+                if wandb.run:
+                    wandb.log(action_log, step=wandb.run.step)
                 Logger.debug(f"Creating DeployDecoy action with hostname: {hostname}")
                 self.last_action = f"DeployDecoy host:{hostname}"
                 return DeployDecoy(session=0, agent=self.name, hostname=hostname)
 
             elif "analyse" in lower_response_action and hostname:
                 action_log[f"{self.name}_analyse"] = 1
-                wandb.log(action_log, step=wandb.run.step)
+                if wandb.run:
+                    wandb.log(action_log, step=wandb.run.step)
                 Logger.debug(f"Creating Analyse action with hostname: {hostname}")
                 self.last_action = f"Analyse host:{hostname}"
                 return Analyse(session=0, agent=self.name, hostname=hostname)
@@ -166,12 +172,14 @@ class LLMDefenderPolicy(Policy):
                 #FIXME: Add logging for sleep action
                 self.last_action = "Sleep"
                 action_log[f"{self.name}_sleep"] = 1
-                wandb.log(action_log, step=wandb.run.step)
+                if wandb.run:
+                    wandb.log(action_log, step=wandb.run.step)
                 Logger.debug("Creating Sleep action")
                 return Sleep()
             # If no valid action found or missing required parameters
             action_log[f"{self.name}_action_invalid"] = 1
-            wandb.log(action_log, step=wandb.run.step)
+            if wandb.run:
+                wandb.log(action_log, step=wandb.run.step)
             Logger.debug("No valid action pattern found or missing required parameters, defaulting to Sleep")
             self.last_action = "Sleep"
             return Sleep()
@@ -180,7 +188,8 @@ class LLMDefenderPolicy(Policy):
             Logger.error(f"Error extracting action: {e}. Defaulting to Sleep.")
             self.last_action = "Sleep"
             action_log[f"{self.name}_error_action_extraction"] = 1
-            wandb.log(action_log, step=wandb.run.step)
+            if wandb.run:
+                wandb.log(action_log, step=wandb.run.step)
 
             return Sleep()
 
